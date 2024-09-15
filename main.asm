@@ -1,6 +1,6 @@
     bits 16
     org 0x100
-%include "..\macros.asm"
+%include "macros.asm"
 Col equ 80
 Row equ 25
 Block_ASC equ 219
@@ -28,9 +28,9 @@ start:
     call clearScreen
     mov ax, 0x1010
     
-.loop 
+.loop: 
     push ax 
-.timeLoop 
+.timeLoop: 
       mov ah, 0x2c 
       int DOS_IRQ
       mov ah,[timer]  
@@ -74,7 +74,7 @@ DrawLineH: ; ax contains starting position, cx should contain length
     ret 
 
 DrawLineV: ; ax start (ah:y, al:x), cx: length  
-  .loop 
+  .loop:
   SetChar Green_Txt, Block_ASC
   inc ah 
   dec cx 

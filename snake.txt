@@ -1,6 +1,6 @@
      1                                      bits 16
      2                                      org 0x100
-     3                                  %include "..\macros.asm"
+     3                                  %include "macros.asm"
      4                              <1> SCREEN_WIDTH equ 320 
      5                              <1> SETCOLORREGISTER_CMD equ 0x1010
      6                              <1> SetColorRegisterBlock equ 0x1012 
@@ -75,11 +75,9 @@
     28 0000000C E89D00                      call clearScreen
     29 0000000F B81010                      mov ax, 0x1010
     30                                      
-    31                                  .loop 
-    31          ******************       warning: label alone on a line without a colon might be in error [-w+label-orphan]
+    31                                  .loop: 
     32 00000012 50                          push ax 
-    33                                  .timeLoop 
-    33          ******************       warning: label alone on a line without a colon might be in error [-w+label-orphan]
+    33                                  .timeLoop: 
     34 00000013 B42C                          mov ah, 0x2c 
     35 00000015 CD21                          int DOS_IRQ
     36 00000017 8A26[D600]                    mov ah,[timer]  
@@ -147,8 +145,7 @@
     74 00000078 C3                          ret 
     75                                  
     76                                  DrawLineV: ; ax start (ah:y, al:x), cx: length  
-    77                                    .loop 
-    77          ******************       warning: label alone on a line without a colon might be in error [-w+label-orphan]
+    77                                    .loop:
     78                                    SetChar Green_Txt, Block_ASC
      9 00000079 50                  <1>  push ax
     10 0000007A 1E                  <1>  push ds
