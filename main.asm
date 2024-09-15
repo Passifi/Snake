@@ -121,7 +121,8 @@ clearScreen:
 .data:
   QHead: dw 0x000  
   QTail: dw 0x000 
-  SnakeQueue: dw 0x000
   Vector: db -1,0 
   Pos: dw 0x1010
-  timer: db 0x00 
+  timer: db 0x00
+  SnakeQueue: times 80*25 dw 0x00
+

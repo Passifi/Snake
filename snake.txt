@@ -67,7 +67,7 @@
     20                                  %endm     
     21                                  
     22                                  start:
-    23 00000000 8D06[D600]                  lea ax, timer 
+    23 00000000 8D06[D400]                  lea ax, timer 
     24 00000004 89C3                        mov bx,ax 
     25 00000006 B42C                        mov ah, 0x2c 
     26 00000008 CD21                        int DOS_IRQ    
@@ -80,13 +80,13 @@
     33                                  .timeLoop: 
     34 00000013 B42C                          mov ah, 0x2c 
     35 00000015 CD21                          int DOS_IRQ
-    36 00000017 8A26[D600]                    mov ah,[timer]  
+    36 00000017 8A26[D400]                    mov ah,[timer]  
     37 0000001B 52                            push dx 
     38 0000001C 28E6                          sub dh,ah 
     39 0000001E 80FE01                        cmp dh, 1  
     40 00000021 5A                            pop dx
     41 00000022 7CEF                          jl .timeLoop
-    42 00000024 8D1E[D600]                  lea bx, timer 
+    42 00000024 8D1E[D400]                  lea bx, timer 
     43 00000028 8837                        mov [bx],dh 
     44 0000002A 58                          pop ax 
     45 0000002B 50                          push ax 
@@ -203,7 +203,8 @@
    121                                  .data:
    122 000000CC 0000                      QHead: dw 0x000  
    123 000000CE 0000                      QTail: dw 0x000 
-   124 000000D0 0000                      SnakeQueue: dw 0x000
-   125 000000D2 FF00                      Vector: db -1,0 
-   126 000000D4 1010                      Pos: dw 0x1010
-   127 000000D6 00                        timer: db 0x00 
+   124 000000D0 FF00                      Vector: db -1,0 
+   125 000000D2 1010                      Pos: dw 0x1010
+   126 000000D4 00                        timer: db 0x00
+   127 000000D5 0000<rep 7D0h>            SnakeQueue: times 80*25 dw 0x00
+   128                                  
