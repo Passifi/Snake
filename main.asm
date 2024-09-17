@@ -1,6 +1,10 @@
     bits 16
     org 0x100
 %include "macros.asm"
+Up_Key equ 72 
+Right_Key equ 77 
+Left_Key equ 75 
+Down_Key equ 80
 Col equ 80
 Row equ 25
 Block_ASC equ 219
@@ -20,6 +24,7 @@ Green_Txt equ 0x0a00
 %endm     
 
 start:
+    call InstallKB 
     lea ax, timer 
     mov bx,ax 
     mov ah, 0x2c 
@@ -27,27 +32,44 @@ start:
     mov [bx],dh 
     call clearScreen
     mov ax, 0x1010
-    
-.loop: 
-    push ax 
-.timeLoop: 
-      mov ah, 0x2c 
-      int DOS_IRQ
-      mov ah,[timer]  
-      push dx 
-      sub dh,ah 
-      cmp dh, 1  
-      pop dx
-      jl .timeLoop
-    lea bx, timer 
-    mov [bx],dh 
-    pop ax 
+.loop:
     push ax 
     SetChar Green_Txt,Block_ASC
+    mov al,[controlByte]
+    cmp al, Right_Key
+    jnz .leftTest
+    mov byte [controlByte],0
     pop ax 
-    inc ah 
-    cmp ah,24 
-    jnz .loop 
+    inc al
+    jmp .loop
+.leftTest:
+  cmp al, Left_Key 
+  jnz .UpTest 
+  mov byte [controlByte],0
+  pop ax 
+  dec al
+  jmp .loop
+.UpTest:
+  cmp al, Up_Key
+  jnz .DownTest
+  mov byte [controlByte],0
+  pop ax 
+  dec ah
+  jmp .loop
+.DownTest:
+  cmp al, Down_Key 
+  jnz .exitTest
+  mov byte [controlByte],0
+  pop ax 
+  inc ah
+  jmp .loop
+.exitTest:
+    mov al,[Quit] 
+    cmp al,1
+    
+    pop ax  
+    jnz .loop
+    call RestoreKB
     Exit
 
 convertPosition: ; ax contains x in al and y in ah  
@@ -117,7 +139,9 @@ clearScreen:
     pop cx 
   pop ds 
   ret 
- 
+
+%include "c:\libs\kb.asm"
+
 .data:
   QHead: dw 0x000  
   QTail: dw 0x000 
