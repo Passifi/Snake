@@ -1,6 +1,7 @@
     bits 16
     org 0x100
 %include "macros.asm"
+FrameCounter equ 2
 Up_Key equ 72 
 Right_Key equ 77 
 Left_Key equ 75 
@@ -26,21 +27,32 @@ Green_Txt equ 0x0a00
 start:
     call InstallKB 
     call clearScreen
+    mov byte [timer],0
     mov ax, 0x0010
     push ax  
 .loop:
     pop ax
+.waitLoop: 
     call WaitFrame 
+    add byte [timer],1
+    cmp byte [timer],FrameCounter 
+    jnz .waitLoop
+    mov byte [timer],0
     mov bx,[Vector]
     add ah,bh 
     add al,bl
+    call collisionDetection
+    cmp dx,0xff 
+    jz .endGame 
     push ax
     SetChar Green_Txt,Block_ASC
     mov al,[controlByte]
-    
+.rightTest: 
     cmp al, Right_Key
     jnz .leftTest
     mov byte [controlByte],0
+    cmp word [Vector],0x00ff
+    jz .loop 
     mov word [Vector],0x0001 
     
     jmp .loop
@@ -48,26 +60,53 @@ start:
   cmp al, Left_Key
   jnz .UpTest 
   mov byte [controlByte],0
+  cmp word [Vector],0x0001
+  jz .loop  
   mov word [Vector],0x00ff
   jmp .loop
 .UpTest:
   cmp al, Up_Key
   jnz .DownTest
-  mov byte [controlByte],0
+  mov byte [controlByte],0 
+  cmp word [Vector],0x0100 
+  jz .loop 
   mov word [Vector],0xff00
   jmp .loop
 .DownTest:
   cmp al, Down_Key 
   jnz .exitTest
   mov byte [controlByte],0
+  cmp word [Vector],0xff00
+  jz .loop 
   mov word [Vector],0x0100
   jmp .loop
 .exitTest:
     mov al,[Quit] 
     cmp al,1
     jnz .loop
+.endGame:
     call RestoreKB
     Exit
+
+collisionDetection:
+  push ax
+  push bx 
+  push ds
+  push cx
+  call convertPosition
+  mov cx, VGA_TEXT_BUFFER 
+  mov ds, cx 
+  mov bx, ax
+  mov word ax, [bx]
+  cmp al, Block_ASC
+  jnz .endOfFunc 
+  mov dx, 0xff   
+.endOfFunc:
+  pop cx
+  pop ds 
+  pop bx
+  pop ax
+  ret
 
 convertPosition: ; ax contains x in al and y in ah  
     push cx 
