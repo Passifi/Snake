@@ -9,7 +9,8 @@ Down_Key equ 80
 Col equ 80
 Row equ 25
 Block_ASC equ 219
-Green_Txt equ 0x0a00 
+Green_Txt equ 0x0a00
+Max_Queue equ 80*20
 %macro SetChar 2  
   push ax
     push ds 
@@ -54,7 +55,6 @@ start:
     cmp word [Vector],0x00ff
     jz .loop 
     mov word [Vector],0x0001 
-    
     jmp .loop
 .leftTest:
   cmp al, Left_Key
@@ -176,6 +176,37 @@ clearScreen:
   pop ds 
   ret 
 
+Enqueue: ; I need callee for this but right now we jsut say dx contains the value 
+  push ax 
+  push bx 
+  mov bx, SnakeQueue 
+  mov word ax, [QHead] 
+  cmp ax, Max_Queue
+  jnz .continue
+  mov ax,0 
+.continue:
+  shr ax,1 
+  add bx, ax 
+  mov [bx],cx 
+  add word [QHead],1 
+  pop bx 
+  pop ax
+  ret 
+Dequeue: 
+  push ax 
+  push bx 
+  mov bx, SnakeQueue 
+  mov word ax, [QTail]
+  cmp ax,[QHead]
+  jz .retArea
+  shr ax,1 
+  add bx, ax 
+  mov cx,[bx]
+  add word [QTail],1 
+.retArea:
+  pop bx 
+  pop ax 
+  ret 
 WaitFrame:	
     push ax
     PUSH	DX
@@ -196,6 +227,7 @@ WaitFrame:
 
 %include "c:\libs\kb.asm"
 .data:
+  ;Variables 
   QHead: dw 0x000  
   QTail: dw 0x000 
   Vector: dw 0x0100 
