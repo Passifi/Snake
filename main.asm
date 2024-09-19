@@ -62,14 +62,15 @@ start:
     call collisionDetection
     cmp dx,0xff 
     jz .endGame
-    push dx 
       push ax
+    push dx 
       mov cx, ax 
     
       call Enqueue 
       SetChar Green_Txt,Block_ASC
     pop dx 
-    cmp dx, 0x10 
+    cmp dx, 0x10
+    mov dx,0 
     jz .continueOver
     call Dequeue
     mov ax,cx 
