@@ -30,7 +30,21 @@ start:
     call clearScreen
     mov byte [timer],0
     mov ax, 0x0010
-    push ax  
+    mov cx,ax 
+    call Enqueue 
+    SetChar Green_Txt, Block_ASC
+    mov ax,cx 
+    inc ax 
+    mov cx,ax 
+    call Enqueue 
+    SetChar Green_Txt, Block_ASC
+    mov ax,cx 
+    inc ax 
+    mov cx,ax 
+    call Enqueue 
+    SetChar Green_Txt, Block_ASC
+    mov ax,cx
+    push ax
 .loop:
     pop ax
 .waitLoop: 
@@ -46,7 +60,13 @@ start:
     cmp dx,0xff 
     jz .endGame 
     push ax
+    mov cx, ax 
+    
+    call Enqueue 
     SetChar Green_Txt,Block_ASC
+    call Dequeue
+    mov ax,cx 
+    SetChar 0x00,0x00
     mov al,[controlByte]
 .rightTest: 
     cmp al, Right_Key
@@ -185,7 +205,7 @@ Enqueue: ; I need callee for this but right now we jsut say dx contains the valu
   jnz .continue
   mov ax,0 
 .continue:
-  shr ax,1 
+  shl ax,1 
   add bx, ax 
   mov [bx],cx 
   add word [QHead],1 
@@ -199,7 +219,7 @@ Dequeue:
   mov word ax, [QTail]
   cmp ax,[QHead]
   jz .retArea
-  shr ax,1 
+  shl ax,1 
   add bx, ax 
   mov cx,[bx]
   add word [QTail],1 
