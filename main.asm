@@ -29,6 +29,8 @@ start:
     call InstallKB 
     call clearScreen
     mov byte [timer],0
+    mov ax, 0x1030 
+    SetChar Green_Txt, 'o'
     mov ax, 0x0010
     mov cx,ax 
     call Enqueue 
@@ -43,6 +45,7 @@ start:
     mov cx,ax 
     call Enqueue 
     SetChar Green_Txt, Block_ASC
+    
     mov ax,cx
     push ax
 .loop:
@@ -58,15 +61,20 @@ start:
     add al,bl
     call collisionDetection
     cmp dx,0xff 
-    jz .endGame 
-    push ax
-    mov cx, ax 
+    jz .endGame
+    push dx 
+      push ax
+      mov cx, ax 
     
-    call Enqueue 
-    SetChar Green_Txt,Block_ASC
+      call Enqueue 
+      SetChar Green_Txt,Block_ASC
+    pop dx 
+    cmp dx, 0x10 
+    jz .continueOver
     call Dequeue
     mov ax,cx 
     SetChar 0x00,0x00
+.continueOver:
     mov al,[controlByte]
 .rightTest: 
     cmp al, Right_Key
@@ -119,8 +127,13 @@ collisionDetection:
   mov bx, ax
   mov word ax, [bx]
   cmp al, Block_ASC
+  jnz .fruitTest 
+  mov dx, 0xff
+  jmp .endOfFunc
+.fruitTest:
+  cmp al, 'o' 
   jnz .endOfFunc 
-  mov dx, 0xff   
+  mov dx, 0x10
 .endOfFunc:
   pop cx
   pop ds 
