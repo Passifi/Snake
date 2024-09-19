@@ -15,7 +15,7 @@ DOS_MEM_ALLOC_CMD equ 0x48 ; bx number of paragraphs (16bytes) ax has the segmen
 DOS_FREE_MEM_CMD equ 0x49 
 DOS_GET_INT_VEC equ 0x00
 DOS_SET_INT_VEC equ 0x25 ; AL carries the int number and DS:DX should contain the interrupt handler 
-
+DOS_GET_TIME equ 0x2c ;ch hours, cl minutes dh seconds, dl centiseconds 
 DOS_IRQ equ 0x21 
 DOS_READ_FILE equ 0x3f  ; BX files handle, cx number of byte to read ;ds:dx address buffer
 DOS_OPEN_FILE equ 0x3d00 ; al access control ah irq request, ds:dx pointer to filename
@@ -26,6 +26,13 @@ KB_ACK equ 0x20
 %macro Exit 0 
     mov ah, DOS_EXIT_CMD
     int DOS_IRQ
+%endm 
+
+%macro Dos_Int 1 
+
+    mov ah, %1 
+    int DOS_IRQ
+
 %endm 
 
 %macro Free 0 

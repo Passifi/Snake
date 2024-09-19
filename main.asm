@@ -1,7 +1,7 @@
     bits 16
     org 0x100
 %include "macros.asm"
-FrameCounter equ 2
+FrameCounter equ 5
 Up_Key equ 72 
 Right_Key equ 77 
 Left_Key equ 75 
@@ -29,8 +29,7 @@ start:
     call InstallKB 
     call clearScreen
     mov byte [timer],0
-    mov ax, 0x1030 
-    SetChar Green_Txt, 'o'
+    call spawnNewFruit
     mov ax, 0x0010
     mov cx,ax 
     call Enqueue 
@@ -134,12 +133,27 @@ collisionDetection:
 .fruitTest:
   cmp al, 'o' 
   jnz .endOfFunc 
+  call spawnNewFruit 
   mov dx, 0x10
 .endOfFunc:
   pop cx
   pop ds 
   pop bx
   pop ax
+  ret
+
+spawnNewFruit:
+  push ax 
+  push bx 
+  push cx 
+  push dx 
+  call generateCoordinates
+  call convertPosition 
+  SetChar Green_Txt, 'o' 
+  pop dx 
+  pop cx 
+  pop bx 
+  pop ax 
   ret
 
 convertPosition: ; ax contains x in al and y in ah  
@@ -188,6 +202,25 @@ drawDiagonal:
     add ax, 0x0101 
     dec cx 
     jnz .loop
+    ret
+
+generateCoordinates:
+    Dos_Int DOS_GET_TIME 
+    mov cx,dx 
+    mov dl, ch 
+    xor ax,ax 
+    mov al,dl 
+    mov bx,80 
+    div bl 
+    mov dl,ah 
+    mov cl,dl 
+    xor ax,ax 
+    mov al,dh
+    mov bx, 20  
+    div bl  
+    mov dl,ah 
+    mov ch,dl 
+    mov ax,cx 
     ret
 
 clearScreen:
