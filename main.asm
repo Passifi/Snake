@@ -138,7 +138,9 @@ collisionDetection:
 .fruitTest:
   cmp al, 'o' 
   jnz .endOfFunc
+  pop ds 
   add word [Score],0x0010 
+  push ds 
   call spawnNewFruit 
   mov dx, 0x10
 .endOfFunc:
