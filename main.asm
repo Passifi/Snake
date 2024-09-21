@@ -13,14 +13,16 @@ Green_Txt equ 0x0a00
 Max_Queue equ 80*20
 %macro SetChar 2  
   push ax
-    push ds 
+  push bx 
+  push ds 
     mov bx, VGA_TEXT_BUFFER 
     mov ds,bx 
     call convertPosition
     mov bx,ax 
     mov ax, %1|%2 
     mov [bx],ax
-    pop ds 
+  pop ds 
+  pop bx
   pop ax 
 
 %endm     
@@ -44,7 +46,6 @@ start:
     mov cx,ax 
     call Enqueue 
     SetChar Green_Txt, Block_ASC
-    
     mov ax,cx
     push ax
 .loop:
@@ -114,6 +115,10 @@ start:
     jnz .loop
 .endGame:
     call RestoreKB
+    cls 
+    mov ax, [Score]
+    push ax 
+    call toChar 
     Exit
 
 collisionDetection:
@@ -132,7 +137,8 @@ collisionDetection:
   jmp .endOfFunc
 .fruitTest:
   cmp al, 'o' 
-  jnz .endOfFunc 
+  jnz .endOfFunc
+  add word [Score],0x0010 
   call spawnNewFruit 
   mov dx, 0x10
 .endOfFunc:
@@ -170,39 +176,6 @@ convertPosition: ; ax contains x in al and y in ah
 .endOfFunc:
     pop cx
     ret 
-     
-DrawLineH: ; ax contains starting position, cx should contain length  
-.loop:
-    SetChar Green_Txt, Block_ASC
-    inc al 
-    dec cx
-    jnz .loop 
-    ret 
-
-DrawLineV: ; ax start (ah:y, al:x), cx: length  
-  .loop:
-  SetChar Green_Txt, Block_ASC
-  inc ah 
-  dec cx 
-  jnz .loop 
-  ret 
-
-
-drawDiagonal:
-    mov cx, 20 
-    mov ah,0
-    mov al,0 
-.loop:
-    push ax 
-    call convertPosition
-    mov bx,ax
-    mov ax, 0x0A00|Block_ASC
-    mov [bx],ax 
-    pop ax 
-    add ax, 0x0101 
-    dec cx 
-    jnz .loop
-    ret
 
 generateCoordinates:
     Dos_Int DOS_GET_TIME 
@@ -293,8 +266,10 @@ WaitFrame:
 		RET
 
 %include "c:\libs\kb.asm"
-.data:
+%include "tochar.asm" 
   ;Variables 
+.data:
+  Score: dw 0x0000
   QHead: dw 0x000  
   QTail: dw 0x000 
   Vector: dw 0x0100 

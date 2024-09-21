@@ -1,3 +1,5 @@
+%ifndef MACROS_ASM 
+%define MACROS_ASM 
 SCREEN_WIDTH equ 320 
 SETCOLORREGISTER_CMD equ 0x1010
 SetColorRegisterBlock equ 0x1012 
@@ -35,6 +37,28 @@ KB_ACK equ 0x20
 
 %endm 
 
+%macro calleeSetup 1
+
+    push bp 
+    mov bp,sp
+    sub sp, %1*2  
+
+%endm 
+%macro calleeDone 0 
+    mov sp,bp
+    pop bp  
+%endm
+
+
+
+
+
+%macro getPar 2 ; 1 is register or adress value 2 is parameter 
+
+    mov %1,[bp+(%2*4)] 
+
+%endm 
+
 %macro Free 0 
     mov es, ax 
     mov ah, DOS_FREE_MEM_CMD
@@ -51,4 +75,6 @@ KB_ACK equ 0x20
     int DOS_IRQ 
     mov dl,'J' 
     int DOS_IRQ
-%endm 
+%endm
+
+%endif 
