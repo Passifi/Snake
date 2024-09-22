@@ -116,8 +116,8 @@ start:
 .endGame:
     call RestoreKB
     cls 
-    mov ax, [Score]
-    push ax 
+    mov word ax, [Score]
+    push ax  
     call toChar 
     Exit
 
@@ -126,6 +126,9 @@ collisionDetection:
   push bx 
   push ds
   push cx
+  push es 
+  mov bx,ds 
+  mov es,bx 
   call convertPosition
   mov cx, VGA_TEXT_BUFFER 
   mov ds, cx 
@@ -138,12 +141,13 @@ collisionDetection:
 .fruitTest:
   cmp al, 'o' 
   jnz .endOfFunc
-  pop ds 
-  add word [Score],0x0010 
-  push ds 
+  mov ax,es 
+  mov ds,ax 
+  add word [Score],0x00A0 
   call spawnNewFruit 
   mov dx, 0x10
 .endOfFunc:
+  pop es 
   pop cx
   pop ds 
   pop bx
