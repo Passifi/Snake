@@ -1,7 +1,7 @@
     bits 16
     org 0x100
 %include "macros.asm"
-FrameCounter equ 5
+FrameCounter equ 100
 Up_Key equ 72 
 Right_Key equ 77 
 Left_Key equ 75 
@@ -50,12 +50,7 @@ start:
     push ax
 .loop:
     pop ax
-.waitLoop: 
-    call WaitFrame 
-    add byte [timer],1
-    cmp byte [timer],FrameCounter 
-    jnz .waitLoop
-    mov byte [timer],0
+   mov byte [timer],0
     mov bx,[Vector]
     add ah,bh 
     add al,bl
@@ -66,6 +61,7 @@ start:
     push dx 
       mov cx, ax 
     
+      call WaitFrame 
       call Enqueue 
       SetChar Green_Txt,Block_ASC
     pop dx 
@@ -184,6 +180,9 @@ convertPosition: ; ax contains x in al and y in ah
     ret 
 
 generateCoordinates:
+    push bx 
+    push cx
+    push dx 
     Dos_Int DOS_GET_TIME 
     mov cx,dx 
     mov dl, ch 
@@ -199,7 +198,10 @@ generateCoordinates:
     div bl  
     mov dl,ah 
     mov ch,dl 
-    mov ax,cx 
+    mov ax,cx
+    pop dx 
+    pop cx 
+    pop bx
     ret
 
 clearScreen:
