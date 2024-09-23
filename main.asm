@@ -1,7 +1,7 @@
     bits 16
     org 0x100
 %include "macros.asm"
-FrameCounter equ 100
+FrameCounter equ 65535 
 Up_Key equ 72 
 Right_Key equ 77 
 Left_Key equ 75 
@@ -50,7 +50,11 @@ start:
     push ax
 .loop:
     pop ax
-   mov byte [timer],0
+.waitLoop: 
+    add word [timer],1
+    cmp word [timer],FrameCounter 
+    jnz .waitLoop
+    mov word [timer],0
     mov bx,[Vector]
     add ah,bh 
     add al,bl
@@ -125,6 +129,19 @@ collisionDetection:
   push es 
   mov bx,ds 
   mov es,bx 
+  cmp ah, 0 
+  jl .setDead 
+  cmp al, 0 ; al x ah y    
+  jl .setDead
+  cmp al,79 
+  jge .setDead
+  cmp ah,24 
+  jge .setDead
+  jmp .collisionTest 
+.setDead: 
+  mov dx, 0xff 
+  jmp .endOfFunc
+.collisionTest:
   call convertPosition
   mov cx, VGA_TEXT_BUFFER 
   mov ds, cx 
@@ -282,6 +299,6 @@ WaitFrame:
   QTail: dw 0x000 
   Vector: dw 0x0100 
   Pos: dw 0x1010
-  timer: db 0x00
+  timer: dw 0x00
   SnakeQueue: times 80*25 dw 0x00
 
