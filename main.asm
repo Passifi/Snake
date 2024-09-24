@@ -9,7 +9,7 @@ Down_Key equ 80
 Col equ 80
 Row equ 25
 Block_ASC equ 219
-Green_Txt equ 0x0a00
+Green_Txt equ 0x0a
 Max_Queue equ 80*20
 %macro SetChar 2  
   push ax
@@ -18,8 +18,9 @@ Max_Queue equ 80*20
     mov bx, VGA_TEXT_BUFFER 
     mov ds,bx 
     call convertPosition
-    mov bx,ax 
-    mov ax, %1|%2 
+    mov bx,ax
+    mov ah, %2  
+    mov byte al, %1 
     mov [bx],ax
   pop ds 
   pop bx
@@ -35,17 +36,17 @@ start:
     mov ax, 0x0010
     mov cx,ax 
     call Enqueue 
-    SetChar Green_Txt, Block_ASC
+    SetChar [Color], Block_ASC
     mov ax,cx 
     inc ax 
     mov cx,ax 
     call Enqueue 
-    SetChar Green_Txt, Block_ASC
+    SetChar [Color], Block_ASC
     mov ax,cx 
     inc ax 
     mov cx,ax 
     call Enqueue 
-    SetChar Green_Txt, Block_ASC
+    SetChar [Color], Block_ASC
     mov ax,cx
     push ax
 .loop:
@@ -67,7 +68,7 @@ start:
     
       call WaitFrame 
       call Enqueue 
-      SetChar Green_Txt,Block_ASC
+      SetChar [Color],Block_ASC
     pop dx 
     cmp dx, 0x10
     mov dx,0 
@@ -294,6 +295,7 @@ WaitFrame:
 %include "tochar.asm" 
   ;Variables 
 .data:
+  Color: db 0x03
   Score: dw 0x0000
   QHead: dw 0x000  
   QTail: dw 0x000 
