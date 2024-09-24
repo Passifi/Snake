@@ -295,7 +295,7 @@ WaitFrame:
 %include "tochar.asm" 
   ;Variables 
 .data:
-  Color: db 0x03
+  Color: db 0x04
   Score: dw 0x0000
   QHead: dw 0x000  
   QTail: dw 0x000 
