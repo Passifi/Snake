@@ -19,8 +19,8 @@ Max_Queue equ 80*20
     mov ds,bx 
     call convertPosition
     mov bx,ax
-    mov ah, %2  
-    mov byte al, %1 
+    mov al, %2  
+    mov byte ah, %1 
     mov [bx],ax
   pop ds 
   pop bx
@@ -36,17 +36,17 @@ start:
     mov ax, 0x0010
     mov cx,ax 
     call Enqueue 
-    SetChar [Color], Block_ASC
+    SetChar Green_Txt, Block_ASC
     mov ax,cx 
     inc ax 
     mov cx,ax 
     call Enqueue 
-    SetChar [Color], Block_ASC
+    SetChar Green_Txt, Block_ASC
     mov ax,cx 
     inc ax 
     mov cx,ax 
     call Enqueue 
-    SetChar [Color], Block_ASC
+    SetChar Green_Txt, Block_ASC
     mov ax,cx
     push ax
 .loop:
@@ -68,7 +68,7 @@ start:
     
       call WaitFrame 
       call Enqueue 
-      SetChar [Color],Block_ASC
+      SetChar Green_Txt,Block_ASC
     pop dx 
     cmp dx, 0x10
     mov dx,0 
@@ -295,7 +295,7 @@ WaitFrame:
 %include "tochar.asm" 
   ;Variables 
 .data:
-  Color: db 0x04
+  Color: db 0x05
   Score: dw 0x0000
   QHead: dw 0x000  
   QTail: dw 0x000 
